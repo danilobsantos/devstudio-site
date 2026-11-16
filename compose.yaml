@@ -1,0 +1,22 @@
+services:
+  db:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:?Defina DB_DATABASE no .env local}
+      MYSQL_USER: ${DB_USERNAME:?Defina DB_USERNAME no .env local}
+      MYSQL_PASSWORD: ${DB_PASSWORD:?Defina DB_PASSWORD no .env local}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Defina MYSQL_ROOT_PASSWORD no .env local}
+    ports:
+      - "127.0.0.1:3307:3306"
+    volumes:
+      - devstudio_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+volumes:
+  devstudio_mysql_data:
+    name: devstudio_mysql_data
