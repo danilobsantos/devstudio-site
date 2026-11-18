@@ -21,6 +21,12 @@
     @forelse ($items as $item)
         @if ($loop->first)<div class="public-listing-grid">@endif
         <x-card class="listing-card">
+            @php($coverImage = $item->cover_path ?: $item->cover_image)
+            @if ($coverImage)
+                <div class="listing-card-media">
+                    <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($coverImage) }}" alt="" width="1200" height="750" loading="lazy" decoding="async">
+                </div>
+            @endif
             <h2><a href="{{ route($detailRoute, ['slug' => $item->slug]) }}">{{ $item->{$titleField} }}</a></h2>
             @if ($item->{$summaryField})<p class="listing-card-desc">{{ $item->{$summaryField} }}</p>@endif
             <div class="listing-card-action">

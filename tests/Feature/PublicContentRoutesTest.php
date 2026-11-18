@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 
@@ -42,6 +43,19 @@ class PublicContentRoutesTest extends TestCase
         foreach (['/produtos/produto-agendado', '/projetos/projeto-agendado', '/insights/artigo-agendado', '/solucoes/servico-agendado', '/produtos/ausente', '/projetos/ausente', '/insights/ausente', '/solucoes/ausente', '/paginas/ausente'] as $path) {
             $this->get($path)->assertNotFound();
         }
+    }
+
+    public function test_listing_renders_existing_public_cover_images_lazily(): void
+    {
+        $this->seedContent();
+        Storage::fake('public');
+        Storage::disk('public')->put('products/demo-cover.webp', 'image');
+        DB::table('products')->where('slug', 'produto-visivel')->update(['cover_path' => 'products/demo-cover.webp']);
+
+        $html = $this->get('/produtos')->assertOk()->getContent();
+
+        $this->assertStringContainsString(Storage::disk('public')->url('products/demo-cover.webp'), $html);
+        $this->assertStringContainsString('loading="lazy" decoding="async"', $html);
     }
 
     public function test_public_metadata_uses_explicit_values_then_editorial_fallbacks_without_site_suffix(): void
@@ -101,8 +115,11 @@ class PublicContentRoutesTest extends TestCase
         ] as $path => [$currentLabel, $isCurrentPage]) {
             $html = $this->get($path)->assertOk()->getContent();
             $this->assertStringContainsString('<html lang="pt-BR" data-theme="system">', $html);
-            $this->assertStringContainsString('<link rel="stylesheet"', $html);
+            $this->assertStringContainsString('<meta name="color-scheme" content="light dark">', $html);
+            $this->assertStringContainsString('data-theme-toggle hidden aria-label="Ativar tema escuro"', $html);
             $this->assertStringContainsString('/build/assets/app-', $html);
+            $this->assertStringContainsString('<link rel="stylesheet"', $html);
+            $this->assertStringContainsString('<script type="module"', $html);
             $this->assertStringContainsString('aria-label="Navegação principal"', $html);
             $this->assertStringContainsString('aria-label="Navegação do rodapé"', $html);
             $this->assertStringContainsString('alt="DevStudio - início"', $html);
@@ -196,7 +213,8 @@ class PublicContentRoutesTest extends TestCase
         $html = $this->get('/')->assertOk()->getContent();
 
         $this->assertStringContainsString('<h1>&lt;script&gt;alert(2)&lt;/script&gt;</h1>', $html);
-        $this->assertStringNotContainsString('<script>', $html);
+        $this->assertStringContainsString('class="page-article page-home"', $html);
+        $this->assertStringNotContainsString('<script>alert(1)</script>', $html);
         foreach (['Hero permitido', 'Soluções permitidas', 'Produtos permitidos', 'Texto permitido', 'Recursos permitidos', 'FAQ permitido', 'CTA permitido', 'Serviço visível', 'Produto visível', 'http://devstudio.test/sobre'] as $expected) {
             $this->assertStringContainsString($expected, $html);
         }
@@ -298,7 +316,7 @@ class PublicContentRoutesTest extends TestCase
 
         $html = $this->get('/paginas/pagina-publica')->assertOk()->getContent();
         $this->assertStringContainsString('&lt;script&gt;alert(1)&lt;/script&gt;', $html);
-        $this->assertStringNotContainsString('<script>', $html);
+        $this->assertStringNotContainsString('<script>alert(1)</script>', $html);
         $this->assertStringContainsString('Hero seguro', $html);
         $this->assertStringContainsString('href="/contato"', $html);
         $this->assertStringContainsString('href="https://example.com/contato?a=1&amp;b=2"', $html);

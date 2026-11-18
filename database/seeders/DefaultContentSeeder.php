@@ -276,42 +276,98 @@ class DefaultContentSeeder extends Seeder
             ]
         );
 
-        // 5. Página Sobre Institucional
+        // 5. Página Sobre Institucional (Seção 5.2 e nova especificação institucional)
         Page::updateOrCreate(
             ['slug' => 'sobre', 'locale' => 'pt_BR'],
             [
                 'title' => 'Sobre a DevStudio',
                 'template' => 'standard',
-                'excerpt' => 'Conheça nossa trajetória, metodologia e compromisso com a excelência técnica em engenharia de software.',
-                'meta_title' => 'Sobre a DevStudio — Inovação Digital & Engenharia de Software',
-                'meta_description' => 'A DevStudio é uma empresa de tecnologia focada em criar softwares corporativos sob medida e sistemas integrados de alta performance.',
+                'excerpt' => 'Tecnologia que transforma negócios. Conheça nossa visão, capacidades e princípios em engenharia de software.',
+                'meta_title' => 'Sobre a DevStudio — Tecnologia que Transforma Negócios',
+                'meta_description' => 'A DevStudio é especializada em desenvolvimento de softwares personalizados, sistemas inteligentes, IA e automação para empresas que buscam inovar e crescer.',
                 'status' => 'published',
                 'published_at' => now(),
                 'sections' => [
+                    // Bloco 1: Hero
                     [
-                        'type' => 'text_image',
+                        'type' => 'hero',
                         'data' => [
-                            'title' => 'Nossa Missão & Propósito',
-                            'text' => "Acreditamos que a tecnologia só cumpre seu papel quando simplifica processos complexos e gera valor mensurável para os negócios.\n\nNa DevStudio, unimos engenharia de software rigorosa, design centrado no usuário e metodologias ágeis para transformar desafios operacionais em plataformas digitais escaláveis e seguras.",
-                        ],
-                    ],
-                    [
-                        'type' => 'features_list',
-                        'data' => [
-                            'title' => 'Nossos Pilares Fundamentais',
-                            'items' => [
-                                ['title' => 'Rigor Técnico & Código Limpo', 'text' => 'Não toleramos atalhos que gerem dívida técnica. Arquitetura testada, versionada e documentada para durar.'],
-                                ['title' => 'Foco em Retorno sobre Investimento', 'text' => 'Cada linha de código deve servir a um objetivo comercial claro: reduzir custos, aumentar vendas ou mitigar riscos.'],
-                                ['title' => 'Transparência Radical', 'text' => 'Comunicação direta, estimativas realistas e acompanhamento em tempo real sem surpresas no cronograma.'],
+                            'title' => 'Tecnologia que transforma negócios.',
+                            'text' => 'Unimos conhecimento técnico, criatividade e visão estratégica para transformar necessidades reais em soluções tecnológicas eficientes, funcionais e alinhadas aos objetivos de cada negócio.',
+                            'ctas' => [
+                                ['label' => 'Vamos conversar sobre seu projeto', 'url' => '/contato'],
+                                ['label' => 'Nossa Visão & Princípios', 'url' => '#principios'],
                             ],
                         ],
                     ],
+                    // Bloco 2: Apresentação Institucional e Posicionamento
+                    [
+                        'type' => 'text_image',
+                        'data' => [
+                            'title' => 'Inovação Digital com Propósito',
+                            'text' => "A DevStudio – Inovação Digital é uma empresa de tecnologia especializada no desenvolvimento de soluções digitais, softwares personalizados e sistemas inteligentes para empresas que desejam evoluir, inovar e alcançar novos resultados.\n\nAcreditamos que a tecnologia deve ser mais do que uma ferramenta: deve ser um instrumento para simplificar processos, superar desafios e criar novas oportunidades de crescimento.\n\nPor isso, unimos conhecimento técnico, criatividade e visão estratégica para transformar necessidades reais em soluções tecnológicas eficientes, funcionais e alinhadas aos objetivos de cada negócio.",
+                        ],
+                    ],
+                    // Bloco 3: O que fazemos (Texto de apresentação)
+                    [
+                        'type' => 'text_image',
+                        'data' => [
+                            'title' => 'O que fazemos',
+                            'text' => "Atuamos em diferentes áreas da tecnologia, desenvolvendo soluções que conectam inovação às necessidades do mercado.\n\nCriamos sistemas personalizados, plataformas empresariais, sites, lojas virtuais e aplicativos. Também desenvolvemos soluções de Inteligência Artificial, agentes inteligentes e automações que tornam operações mais ágeis, integradas e eficientes.\n\nAlém dos projetos sob medida, investimos no desenvolvimento de produtos próprios, como plataformas SaaS e sistemas de gestão, ampliando o acesso das empresas a ferramentas que simplificam o dia a dia e apoiam sua evolução.",
+                        ],
+                    ],
+                    // Bloco 3: O que fazemos (Cards)
+                    [
+                        'type' => 'services_grid',
+                        'data' => [
+                            'title' => 'Soluções & Capacidades Tecnológicas',
+                            'service_ids' => $serviceIds,
+                        ],
+                    ],
+                    // Bloco 4: Nossa visão sobre tecnologia
+                    [
+                        'type' => 'text_image',
+                        'data' => [
+                            'title' => 'Nossa visão sobre tecnologia',
+                            'text' => "Cada empresa possui desafios, processos e objetivos diferentes. Por isso, acreditamos que boas soluções começam com a compreensão de cada negócio.\n\nNão buscamos simplesmente desenvolver software ou implementar ferramentas. Nosso propósito é identificar oportunidades, entender necessidades e aplicar a tecnologia de maneira inteligente para gerar valor.\n\nTrabalhamos com uma abordagem que combina planejamento, desenvolvimento, integração e evolução contínua, buscando entregar soluções que façam sentido tanto hoje quanto no futuro.",
+                        ],
+                    ],
+                    // Bloco 4: Nossos princípios
+                    [
+                        'type' => 'features_list',
+                        'data' => [
+                            'title' => 'Nossos princípios',
+                            'items' => [
+                                [
+                                    'title' => 'Inovação com propósito',
+                                    'text' => 'Utilizamos a tecnologia para resolver problemas reais e criar novas possibilidades para os negócios.',
+                                ],
+                                [
+                                    'title' => 'Soluções sob medida',
+                                    'text' => 'Cada projeto deve respeitar as necessidades, os objetivos e a realidade de quem irá utilizá-lo.',
+                                ],
+                                [
+                                    'title' => 'Qualidade e eficiência',
+                                    'text' => 'Valorizamos boas práticas de desenvolvimento, organização e soluções construídas para funcionar de maneira consistente.',
+                                ],
+                                [
+                                    'title' => 'Evolução contínua',
+                                    'text' => 'A tecnologia está sempre mudando. Acompanhamos essa evolução para desenvolver soluções cada vez mais relevantes.',
+                                ],
+                                [
+                                    'title' => 'Parceria e compromisso',
+                                    'text' => 'Entendemos que cada projeto representa um objetivo importante para nossos clientes. Por isso, valorizamos a comunicação, a transparência e o comprometimento em cada etapa.',
+                                ],
+                            ],
+                        ],
+                    ],
+                    // Bloco 5: Encerramento com CTA
                     [
                         'type' => 'cta',
                         'data' => [
-                            'title' => 'Vamos construir seu próximo projeto juntos?',
-                            'text' => 'Descubra como nossa equipe pode ajudar sua empresa a alcançar um novo patamar de eficiência e maturidade digital.',
-                            'label' => 'Iniciar conversa',
+                            'title' => 'Construindo o futuro através da tecnologia.',
+                            'text' => "Acreditamos que empresas de todos os portes podem utilizar a tecnologia para trabalhar melhor, crescer e conquistar novos espaços no mercado. É com essa visão que a DevStudio desenvolve soluções digitais: aproximando inovação e negócios para transformar desafios em possibilidades.\n\nDevStudio – Inovação Digital. Tecnologia que transforma negócios.",
+                            'label' => 'Vamos conversar sobre seu próximo projeto?',
                             'url' => '/contato',
                         ],
                     ],

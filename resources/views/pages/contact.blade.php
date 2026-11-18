@@ -2,14 +2,13 @@
 
 @section('content')
 <main id="main-content">
-    <x-breadcrumbs :items="[['label' => 'Início', 'url' => url('/')], ['label' => 'Contato', 'current' => true]]" />
-
-    <header style="margin-bottom: 2rem;">
-        <h1 style="font-size: clamp(1.75rem, 3vw, 2.5rem); margin-bottom: 0.5rem;">Fale com a DevStudio</h1>
-        <p style="color: var(--theme-text); opacity: 0.85; max-width: 45rem; font-size: 1.125rem;">
+    <div class="listing-hero">
+        <x-breadcrumbs :items="[['label' => 'Início', 'url' => url('/')], ['label' => 'Contato', 'current' => true]]" />
+        <h1 class="listing-title">Fale com a DevStudio</h1>
+        <p class="listing-lead">
             Conte-nos sobre o seu desafio ou projeto. Desenvolvemos soluções sob medida para acelerar e digitalizar sua operação.
         </p>
-    </header>
+    </div>
 
     @if (session('status') === 'success')
         <div class="ui-card" role="alert" style="border-left: 4px solid #10B981; margin-bottom: 2rem; background: color-mix(in srgb, #10B981 8%, var(--theme-background));">
@@ -18,7 +17,7 @@
         </div>
     @endif
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); gap: 2rem; align-items: start;">
+    <div class="contact-layout" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); gap: 2rem; align-items: start;">
         {{-- Formulário Comercial --}}
         <div class="ui-card">
             <form action="{{ route('contact.submit') }}" method="POST" novalidate>

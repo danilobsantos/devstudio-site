@@ -3,6 +3,16 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <script>
+        try {
+            const theme = localStorage.getItem('devstudio-color-scheme');
+            if (theme === 'light' || theme === 'dark') {
+                document.documentElement.dataset.theme = theme;
+                document.querySelector('meta[name="color-scheme"]').content = theme;
+            }
+        } catch {}
+    </script>
     @if (! empty($metaTitle))<title>{{ $metaTitle }}</title>@endif
     @if (! empty($metaDescription))<meta name="description" content="{{ $metaDescription }}">@endif
 
@@ -37,9 +47,20 @@
     </script>
 
     <style>
+        :root {
+            color-scheme: light dark;
+        }
+
+        :root:has(> head > meta[name='color-scheme'][content='light']) {
+            color-scheme: light;
+        }
+
+        :root:has(> head > meta[name='color-scheme'][content='dark']) {
+            color-scheme: dark;
+        }
+
         :root[data-theme='system'],
         :root[data-theme='light'] {
-            color-scheme: light;
             --theme-background: #F6F6F7;
             --theme-text: #17171B;
             --theme-link: #D10047;
@@ -49,7 +70,6 @@
         }
 
         :root[data-theme='dark'] {
-            color-scheme: dark;
             --theme-background: #17191E;
             --theme-text: #F6F6F7;
             --theme-link: #F6F6F7;
@@ -60,7 +80,6 @@
 
         @media (prefers-color-scheme: dark) {
             :root[data-theme='system'] {
-                color-scheme: dark;
                 --theme-background: #17191E;
                 --theme-text: #F6F6F7;
                 --theme-link: #F6F6F7;
@@ -153,6 +172,64 @@
             border-radius: 9999px !important;
             white-space: nowrap;
             flex-shrink: 0;
+            background-color: #D10047 !important;
+            color: #FFFFFF !important;
+            text-decoration: none !important;
+        }
+
+        .site-header-cta:hover:not(:disabled) {
+            background-color: #C8104A !important;
+            color: #FFFFFF !important;
+        }
+
+        .theme-toggle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.75rem;
+            height: 2.75rem;
+            flex: 0 0 auto;
+            padding: 0;
+            border: 1px solid var(--color-border);
+            border-radius: 50%;
+            background: transparent;
+            color: var(--theme-text);
+            cursor: pointer;
+            transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease;
+        }
+
+        .theme-toggle[hidden] {
+            display: none !important;
+        }
+
+        .theme-toggle:hover {
+            background: color-mix(in srgb, var(--theme-text) 6%, var(--theme-background));
+        }
+
+        .theme-toggle__sun {
+            display: none;
+        }
+
+        .theme-toggle__moon {
+            display: block;
+        }
+
+        html[data-theme='dark'] .theme-toggle__sun {
+            display: block;
+        }
+
+        html[data-theme='dark'] .theme-toggle__moon {
+            display: none;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            html[data-theme='system'] .theme-toggle__sun {
+                display: block;
+            }
+
+            html[data-theme='system'] .theme-toggle__moon {
+                display: none;
+            }
         }
 
         .page-article {
@@ -258,28 +335,127 @@
             border-radius: 0.625rem;
         }
 
+        .ui-button {
+            box-sizing: border-box;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            min-height: 2.75rem;
+            padding: 0.75rem 1rem;
+            border: 1px solid transparent;
+            border-radius: 0.5rem;
+            font: inherit;
+            font-weight: 600;
+            text-align: center;
+            text-decoration: none !important;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        html[data-theme] a.ui-button,
+        html[data-theme] button.ui-button,
+        html[data-theme] .ui-button {
+            text-decoration: none !important;
+        }
+
         .hero-btn-primary {
-            background: #D10047;
-            color: #FFFFFF;
+            background: #D10047 !important;
+            color: #FFFFFF !important;
             box-shadow: 0 8px 24px -4px rgba(209, 0, 71, 0.4);
         }
 
         .hero-btn-primary:hover:not(:disabled) {
-            background: #C8104A;
+            background: #C8104A !important;
+            color: #FFFFFF !important;
             transform: translateY(-2px);
             box-shadow: 0 12px 28px -4px rgba(209, 0, 71, 0.5);
         }
 
         .hero-btn-secondary {
-            border: 1px solid var(--color-border);
-            background: var(--theme-background);
-            color: var(--theme-text);
+            border: 1px solid var(--color-border) !important;
+            background: var(--card-background) !important;
+            color: var(--theme-text) !important;
         }
 
         .hero-btn-secondary:hover:not(:disabled) {
-            background: color-mix(in srgb, var(--theme-text) 5%, var(--theme-background));
-            border-color: var(--theme-text);
+            background: color-mix(in srgb, #D10047 8%, var(--theme-background)) !important;
+            border-color: #D10047 !important;
+            color: #D10047 !important;
             transform: translateY(-2px);
+        }
+
+        /* High-specificity overrides against html[data-theme] a */
+        html[data-theme] a.ui-button--primary,
+        html[data-theme] button.ui-button--primary,
+        html[data-theme] .ui-button--primary,
+        html[data-theme] .hero-btn-primary,
+        html[data-theme] .site-header-cta,
+        html[data-theme] .ui-cta-banner__btn {
+            color: #FFFFFF !important;
+            background-color: #D10047 !important;
+            text-decoration: none !important;
+        }
+
+        html[data-theme] a.ui-button--primary *,
+        html[data-theme] button.ui-button--primary *,
+        html[data-theme] .ui-button--primary *,
+        html[data-theme] .hero-btn-primary *,
+        html[data-theme] .site-header-cta *,
+        html[data-theme] .ui-cta-banner__btn * {
+            color: #FFFFFF !important;
+            text-decoration: none !important;
+        }
+
+        html[data-theme] a.ui-button--primary:visited,
+        html[data-theme] .site-header-cta:visited,
+        html[data-theme] .hero-btn-primary:visited,
+        html[data-theme] .ui-cta-banner__btn:visited {
+            color: #FFFFFF !important;
+        }
+
+        html[data-theme] a.ui-button--primary:hover,
+        html[data-theme] button.ui-button--primary:hover,
+        html[data-theme] .ui-button--primary:hover,
+        html[data-theme] .hero-btn-primary:hover,
+        html[data-theme] .site-header-cta:hover,
+        html[data-theme] .ui-cta-banner__btn:hover {
+            color: #FFFFFF !important;
+            background-color: #C8104A !important;
+        }
+
+        html[data-theme] a.ui-button--secondary,
+        html[data-theme] button.ui-button--secondary,
+        html[data-theme] .ui-button--secondary,
+        html[data-theme] a.ui-button--secondary *,
+        html[data-theme] button.ui-button--secondary *,
+        html[data-theme] .hero-btn-secondary,
+        html[data-theme] .hero-btn-secondary * {
+            color: var(--theme-text) !important;
+            border: 1px solid var(--color-border) !important;
+            background-color: var(--card-background) !important;
+            text-decoration: none !important;
+        }
+
+        html[data-theme] a.ui-button--secondary:visited,
+        html[data-theme] .hero-btn-secondary:visited {
+            color: var(--theme-text) !important;
+        }
+
+        html[data-theme] a.ui-button--secondary:hover,
+        html[data-theme] button.ui-button--secondary:hover,
+        html[data-theme] .ui-button--secondary:hover,
+        html[data-theme] .hero-btn-secondary:hover {
+            color: #D10047 !important;
+            border-color: #D10047 !important;
+            background-color: color-mix(in srgb, #D10047 8%, var(--theme-background)) !important;
+        }
+
+        html[data-theme] a.ui-button--secondary:hover *,
+        html[data-theme] button.ui-button--secondary:hover *,
+        html[data-theme] .ui-button--secondary:hover *,
+        html[data-theme] .hero-btn-secondary:hover * {
+            color: #D10047 !important;
         }
 
         .hero-trust-bar {
@@ -383,14 +559,16 @@
             margin: 0 0 0.75rem;
         }
 
-        .card-item-title a {
-            color: var(--theme-text);
+        .card-item-title a,
+        html[data-theme] .card-item-title a {
+            color: var(--theme-text) !important;
             text-decoration: none;
             transition: color 0.2s;
         }
 
-        .card-item-title a:hover {
-            color: #D10047;
+        .card-item-title a:hover,
+        html[data-theme] .card-item-title a:hover {
+            color: #D10047 !important;
         }
 
         .card-item-desc {
@@ -553,8 +731,8 @@
         }
 
         .ui-cta-banner__btn {
-            background: #D10047;
-            color: #FFFFFF;
+            background: #D10047 !important;
+            color: #FFFFFF !important;
             padding: 0.875rem 1.75rem;
             font-size: 1.05rem;
             border-radius: 0.625rem;
@@ -563,7 +741,8 @@
         }
 
         .ui-cta-banner__btn:hover:not(:disabled) {
-            background: #C8104A;
+            background: #C8104A !important;
+            color: #FFFFFF !important;
             box-shadow: 0 8px 25px rgba(209, 0, 71, 0.6);
             transform: translateY(-2px);
         }
@@ -702,15 +881,83 @@
             font-size: 1.125rem;
         }
 
+        /* Breadcrumbs component */
+        .ui-breadcrumbs {
+            margin-top: clamp(2rem, 4.5vw, 3.5rem);
+            margin-bottom: 1.5rem;
+        }
+
+        .listing-hero .ui-breadcrumbs {
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+        }
+
+        .page-about-breadcrumbs {
+            margin-top: clamp(2rem, 4.5vw, 3.5rem);
+            margin-bottom: 0;
+        }
+
+        .page-about-breadcrumbs .ui-breadcrumbs {
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+
+        .ui-breadcrumbs ol {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            font-size: 0.875rem;
+            opacity: 0.85;
+        }
+
+        .ui-breadcrumbs li {
+            display: inline-flex;
+            align-items: center;
+            color: var(--theme-text);
+        }
+
+        .ui-breadcrumbs a {
+            color: var(--theme-text);
+            opacity: 0.75;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s, opacity 0.2s;
+        }
+
+        .ui-breadcrumbs a:hover {
+            color: #D10047 !important;
+            opacity: 1;
+        }
+
+        .ui-breadcrumbs li + li::before {
+            content: '/';
+            opacity: 0.45;
+            color: var(--theme-text);
+            margin-right: 0.5rem;
+        }
+
+        .ui-breadcrumbs span[aria-current='page'],
+        .ui-breadcrumbs span {
+            color: var(--theme-text);
+            opacity: 0.95;
+            font-weight: 600;
+        }
+
         .listing-hero {
-            margin-bottom: 2.5rem;
-            max-width: 48rem;
+            margin-block: clamp(3rem, 7vw, 6rem) clamp(2.5rem, 5vw, 4rem);
+            max-width: 52rem;
         }
 
         .listing-title {
             font-size: clamp(2rem, 4vw, 3rem);
             margin: 0 0 0.75rem;
             line-height: 1.2;
+            letter-spacing: -0.05em;
+            font-weight: 600;
         }
 
         .listing-lead {
@@ -739,14 +986,16 @@
             line-height: 1.3;
         }
 
-        .listing-card h2 a {
-            color: var(--theme-text);
+        .listing-card h2 a,
+        html[data-theme] .listing-card h2 a {
+            color: var(--theme-text) !important;
             text-decoration: none;
             transition: color 0.2s;
         }
 
-        .listing-card h2 a:hover {
-            color: #D10047;
+        .listing-card h2 a:hover,
+        html[data-theme] .listing-card h2 a:hover {
+            color: #D10047 !important;
         }
 
         .listing-card-desc {
@@ -801,9 +1050,164 @@
             transform: scale(1.08);
             box-shadow: 0 12px 28px rgba(37, 211, 102, 0.55);
         }
+
+        /* Page About - Editorial & Spacious Layout */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        .page-about > h1 {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            padding: 0 !important;
+            margin: -1px !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            white-space: nowrap !important;
+            border: 0 !important;
+        }
+
+        .page-about .section-block {
+            margin-block: clamp(4.5rem, 8vw, 7.5rem);
+        }
+
+        .page-about .section-block--hero {
+            margin-top: clamp(1rem, 2vw, 1.75rem);
+            margin-bottom: clamp(4.5rem, 8vw, 7rem);
+        }
+
+        .page-about .section-text-block {
+            max-width: 50rem;
+        }
+
+        .page-about .section-text-block p {
+            font-size: clamp(1.0625rem, 1.8vw, 1.25rem);
+            line-height: 1.8;
+            color: var(--theme-text);
+            opacity: 0.88;
+            margin: 0 0 1.5rem;
+        }
+
+        .page-about .section-text-block p:first-of-type {
+            font-size: clamp(1.15rem, 2.2vw, 1.35rem);
+            line-height: 1.65;
+            font-weight: 500;
+            opacity: 0.95;
+        }
+
+        .page-about .section-text-block p:last-child {
+            margin-bottom: 0;
+        }
+
+        .page-about .section-header {
+            max-width: 48rem;
+            margin-bottom: 2.25rem;
+        }
+
+        .page-about .section-header h2 {
+            font-size: clamp(2rem, 3.8vw, 2.85rem);
+            letter-spacing: -0.035em;
+            line-height: 1.15;
+        }
+
+        .page-about .features-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+            gap: 1.75rem;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .page-about .feature-card {
+            padding: 2.25rem 2rem;
+            border: 1px solid var(--color-border);
+            border-radius: 1rem;
+            background: var(--card-background);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+            transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page-about .feature-card:hover {
+            border-color: #D10047;
+            transform: translateY(-3px);
+            box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.08), 0 0 0 1px #D10047;
+        }
+
+        .page-about .feature-num {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.85rem;
+            font-weight: 800;
+            color: #D10047;
+            margin-bottom: 1rem;
+            line-height: 1;
+        }
+
+        .page-about .feature-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--theme-text);
+            margin-bottom: 0.75rem;
+            line-height: 1.3;
+        }
+
+        .page-about .feature-text {
+            font-size: 0.95rem;
+            line-height: 1.65;
+            color: var(--theme-text);
+            opacity: 0.82;
+            margin: 0;
+        }
+
+        /* About Page - Vision 2-Column Editorial Grid */
+        .about-vision-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.15fr) minmax(18rem, 0.85fr);
+            gap: clamp(2rem, 5vw, 4.5rem);
+            align-items: center;
+        }
+
+        .about-vision-art {
+            position: relative;
+            border-radius: 1rem;
+            overflow: hidden;
+            background: #17191E;
+            border: 1px solid var(--color-border);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.15);
+        }
+
+        .about-vision-art img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            min-height: 22rem;
+            max-height: 28rem;
+            object-fit: cover;
+            object-position: center;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .about-vision-art:hover img {
+            transform: scale(1.02);
+        }
+
+        @media (max-width: 64rem) {
+            .about-vision-grid {
+                grid-template-columns: minmax(0, 1fr);
+                gap: 2.5rem;
+            }
+
+            .about-vision-art img {
+                min-height: 18rem;
+            }
+        }
     </style>
 
-    @vite('resources/css/app.css')
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="public-layout">
     <a class="skip-link" href="#main-content">Pular para o conteúdo</a>
@@ -815,7 +1219,13 @@
                 <img class="site-logo site-logo--dark" src="{{ asset('images/logo_devstudio_light_300x60.png') }}" alt="DevStudio - início">
             </a>
             <x-public-navigation label="Navegação principal" />
-            <x-button variant="primary" :href="route('contact.show')" class="site-header-cta">Fale com a DevStudio</x-button>
+            <div class="site-header-actions">
+                <button class="theme-toggle" type="button" data-theme-toggle hidden aria-label="Ativar tema escuro">
+                    <svg class="theme-toggle__sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path></svg>
+                    <svg class="theme-toggle__moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.98 13A9 9 0 0 1 11 3.02 9 9 0 1 0 20.98 13Z"></path></svg>
+                </button>
+                <x-button variant="primary" :href="route('contact.show')" class="site-header-cta">Fale com a DevStudio</x-button>
+            </div>
         </div>
     </header>
 

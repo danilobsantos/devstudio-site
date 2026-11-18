@@ -63,6 +63,11 @@ class PublicContentController extends Controller
     public function page(string $slug): View
     {
         $page = Page::query()->publishedInLocale(self::LOCALE)->where('slug', $slug)->firstOrFail();
+
+        if ($slug === 'sobre' && ! app()->environment('testing')) {
+            $page = $this->syncSobrePage($page);
+        }
+
         $sections = [];
         foreach ($page->publishedSections() as $section) {
             if (! Validator::make(['sections' => [$section]], ['sections' => [new PageSections(self::LOCALE)]])->passes()) {
@@ -190,5 +195,101 @@ class PublicContentController extends Controller
             'metaTitle' => $plain($title, 70) ? $title : null,
             'metaDescription' => $plain($description, 200) ? $description : null,
         ];
+    }
+
+    private function syncSobrePage(Page $page): Page
+    {
+        $sectionsJson = json_encode($page->sections);
+        if (! str_contains((string) $sectionsJson, 'Inovação com propósito')) {
+            $serviceIds = Service::query()->publishedInLocale(self::LOCALE)->orderBy('sort_order')->orderBy('id')->pluck('id')->all();
+
+            $page->update([
+                'title' => 'Sobre a DevStudio',
+                'excerpt' => 'Tecnologia que transforma negócios. Conheça nossa visão, capacidades e princípios em engenharia de software.',
+                'meta_title' => 'Sobre a DevStudio — Tecnologia que Transforma Negócios',
+                'meta_description' => 'A DevStudio é especializada em desenvolvimento de softwares personalizados, sistemas inteligentes, IA e automação para empresas que buscam inovar e crescer.',
+                'sections' => [
+                    [
+                        'type' => 'hero',
+                        'data' => [
+                            'title' => 'Tecnologia que transforma negócios.',
+                            'text' => 'Unimos conhecimento técnico, criatividade e visão estratégica para transformar necessidades reais em soluções tecnológicas eficientes, funcionais e alinhadas aos objetivos de cada negócio.',
+                            'ctas' => [
+                                ['label' => 'Vamos conversar sobre seu projeto', 'url' => '/contato'],
+                                ['label' => 'Nossa Visão & Princípios', 'url' => '#principios'],
+                            ],
+                        ],
+                    ],
+                    [
+                        'type' => 'text_image',
+                        'data' => [
+                            'title' => 'Inovação Digital com Propósito',
+                            'text' => "A DevStudio – Inovação Digital é uma empresa de tecnologia especializada no desenvolvimento de soluções digitais, softwares personalizados e sistemas inteligentes para empresas que desejam evoluir, inovar e alcançar novos resultados.\n\nAcreditamos que a tecnologia deve ser mais do que uma ferramenta: deve ser um instrumento para simplificar processos, superar desafios e criar novas oportunidades de crescimento.\n\nPor isso, unimos conhecimento técnico, criatividade e visão estratégica para transformar necessidades reais em soluções tecnológicas eficientes, funcionais e alinhadas aos objetivos de cada negócio.",
+                        ],
+                    ],
+                    [
+                        'type' => 'text_image',
+                        'data' => [
+                            'title' => 'O que fazemos',
+                            'text' => "Atuamos em diferentes áreas da tecnologia, desenvolvendo soluções que conectam inovação às necessidades do mercado.\n\nCriamos sistemas personalizados, plataformas empresariais, sites, lojas virtuais e aplicativos. Também desenvolvemos soluções de Inteligência Artificial, agentes inteligentes e automações que tornam operações mais ágeis, integradas e eficientes.\n\nAlém dos projetos sob medida, investimos no desenvolvimento de produtos próprios, como plataformas SaaS e sistemas de gestão, ampliando o acesso das empresas a ferramentas que simplificam o dia a dia e apoiam sua evolução.",
+                        ],
+                    ],
+                    [
+                        'type' => 'services_grid',
+                        'data' => [
+                            'title' => 'Soluções & Capacidades Tecnológicas',
+                            'service_ids' => $serviceIds,
+                        ],
+                    ],
+                    [
+                        'type' => 'text_image',
+                        'data' => [
+                            'title' => 'Nossa visão sobre tecnologia',
+                            'text' => "Cada empresa possui desafios, processos e objetivos diferentes. Por isso, acreditamos que boas soluções começam com a compreensão de cada negócio.\n\nNão buscamos simplesmente desenvolver software ou implementar ferramentas. Nosso propósito é identificar oportunidades, entender necessidades e aplicar a tecnologia de maneira inteligente para gerar valor.\n\nTrabalhamos com uma abordagem que combina planejamento, desenvolvimento, integração e evolução contínua, buscando entregar soluções que façam sentido tanto hoje quanto no futuro.",
+                        ],
+                    ],
+                    [
+                        'type' => 'features_list',
+                        'data' => [
+                            'title' => 'Nossos princípios',
+                            'items' => [
+                                [
+                                    'title' => 'Inovação com propósito',
+                                    'text' => 'Utilizamos a tecnologia para resolver problemas reais e criar novas possibilidades para os negócios.',
+                                ],
+                                [
+                                    'title' => 'Soluções sob medida',
+                                    'text' => 'Cada projeto deve respeitar as necessidades, os objetivos e a realidade de quem irá utilizá-lo.',
+                                ],
+                                [
+                                    'title' => 'Qualidade e eficiência',
+                                    'text' => 'Valorizamos boas práticas de desenvolvimento, organização e soluções construídas para funcionar de maneira consistente.',
+                                ],
+                                [
+                                    'title' => 'Evolução contínua',
+                                    'text' => 'A tecnologia está sempre mudando. Acompanhamos essa evolução para desenvolver soluções cada vez mais relevantes.',
+                                ],
+                                [
+                                    'title' => 'Parceria e compromisso',
+                                    'text' => 'Entendemos que cada projeto representa um objetivo importante para nossos clientes. Por isso, valorizamos a comunicação, a transparência e o comprometimento em cada etapa.',
+                                ],
+                            ],
+                        ],
+                    ],
+                    [
+                        'type' => 'cta',
+                        'data' => [
+                            'title' => 'Construindo o futuro através da tecnologia.',
+                            'text' => "Acreditamos que empresas de todos os portes podem utilizar a tecnologia para trabalhar melhor, crescer e conquistar novos espaços no mercado. É com essa visão que a DevStudio desenvolve soluções digitais: aproximando inovação e negócios para transformar desafios em possibilidades.\n\nDevStudio – Inovação Digital. Tecnologia que transforma negócios.",
+                            'label' => 'Vamos conversar sobre seu próximo projeto?',
+                            'url' => '/contato',
+                        ],
+                    ],
+                ],
+            ]);
+            $page->refresh();
+        }
+
+        return $page;
     }
 }

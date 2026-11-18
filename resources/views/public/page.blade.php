@@ -3,15 +3,17 @@
 @section('content')
 <main id="main-content">
     @if ($page->slug !== 'home')
-        <x-breadcrumbs :items="[['label' => 'Início', 'url' => url('/')], ['label' => $page->title, 'current' => true]]" />
+        <div class="{{ $page->slug === 'sobre' ? 'page-about-breadcrumbs' : '' }}">
+            <x-breadcrumbs :items="[['label' => 'Início', 'url' => url('/')], ['label' => $page->slug === 'sobre' ? 'Sobre' : $page->title, 'current' => true]]" />
+        </div>
     @endif
 
-    <article class="page-article {{ $page->slug === 'home' ? 'page-home' : 'page-standard' }}">
+    <article class="page-article {{ $page->slug === 'home' ? 'page-home' : ($page->slug === 'sobre' ? 'page-about' : 'page-standard') }}">
         <h1>{{ $page->title }}</h1>
-        @if ($page->slug !== 'home' && $page->excerpt)<p class="page-lead">{{ $page->excerpt }}</p>@endif
+        @if ($page->slug !== 'home' && $page->slug !== 'sobre' && $page->excerpt)<p class="page-lead">{{ $page->excerpt }}</p>@endif
 
         @foreach ($sections as $section)
-            <section class="section-block section-block--{{ str_replace('_', '-', $section['type']) }}">
+            <section class="section-block section-block--{{ str_replace('_', '-', $section['type']) }}" @if ($section['type'] === 'features_list') id="principios" @endif>
                 @if ($section['type'] !== 'cta')
                     @if ($section['type'] === 'hero')
                         <div class="hero-copy">
@@ -20,7 +22,7 @@
                         @switch($section['type'])
                             @case('hero')
                                 <div class="hero-badge">
-                                    <span>Engenharia de Software &amp; Inovação Digital</span>
+                                    <span>{{ $page->slug === 'sobre' ? 'Sobre a DevStudio' : 'Engenharia de Software & Inovação Digital' }}</span>
                                 </div>
                                 @break
                             @case('services_grid')
@@ -30,17 +32,18 @@
                                 <span class="section-kicker">Ecossistema DevStudio</span>
                                 @break
                             @case('features_list')
-                                <span class="section-kicker">Diferenciais Competitivos</span>
+                                <span class="section-kicker">{{ $page->slug === 'sobre' ? 'Nossos Princípios & Valores' : 'Diferenciais Competitivos' }}</span>
                                 @break
                             @case('faq')
                                 <span class="section-kicker">Dúvidas Frequentes</span>
                                 @break
+                            @case('text_image')
+                                @if ($page->slug === 'sobre')
+                                    <span class="section-kicker">Institucional &amp; Filosofia</span>
+                                @endif
+                                @break
                         @endswitch
-                        @if ($section['type'] === 'hero')
-                            <h2>{{ $section['data']['title'] }}</h2>
-                        @else
-                            <h2>{{ $section['data']['title'] }}</h2>
-                        @endif
+                        <h2>{{ $section['data']['title'] }}</h2>
                     </div>
                 @endif
 
@@ -71,15 +74,37 @@
                         @if ($section['type'] === 'hero')
                             </div>
                             <div class="hero-art">
-                                <img src="{{ asset('images/devstudio-hero.jpg') }}" alt="" width="1536" height="1024" fetchpriority="high">
+                                @php
+                                    $heroImage = ($page->slug === 'sobre' && file_exists(public_path('images/devstudio-about-hero.jpg')))
+                                        ? 'images/devstudio-about-hero.jpg'
+                                        : 'images/devstudio-hero.jpg';
+                                @endphp
+                                <img src="{{ asset($heroImage) }}" alt="DevStudio - Tecnologia que transforma negócios" width="1536" height="1024" fetchpriority="high">
                             </div>
                         @endif
                         @break
 
                     @case('text_image')
-                        @if (isset($section['data']['text']))
+                        @if ($page->slug === 'sobre' && str_contains(mb_strtolower($section['data']['title']), 'visão') && file_exists(public_path('images/devstudio-about-vision.jpg')))
+                            <div class="about-vision-grid">
+                                <div class="section-text-block">
+                                    @foreach (explode("\n\n", $section['data']['text']) as $paragraph)
+                                        @if (trim($paragraph))
+                                            <p>{{ trim($paragraph) }}</p>
+                                        @endif
+                                    @endforeach
+                                </div>
+                                <div class="about-vision-art">
+                                    <img src="{{ asset('images/devstudio-about-vision.jpg') }}" alt="DevStudio - Visão estratégica sobre tecnologia" width="1200" height="800" loading="lazy">
+                                </div>
+                            </div>
+                        @elseif (isset($section['data']['text']))
                             <div class="section-text-block">
-                                <p>{{ $section['data']['text'] }}</p>
+                                @foreach (explode("\n\n", $section['data']['text']) as $paragraph)
+                                    @if (trim($paragraph))
+                                        <p>{{ trim($paragraph) }}</p>
+                                    @endif
+                                @endforeach
                             </div>
                         @endif
                         @break
